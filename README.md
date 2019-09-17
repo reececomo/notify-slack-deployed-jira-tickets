@@ -19,3 +19,7 @@ GitHub Action to notify Slack when JIRA tickets have been deployed.
         SLACK_WEBHOOK_URL: '...'
         JIRA_PREFIX: '...'
 ```
+
+## Credits
+
+- Based off of the [fnkr/github-action-git-bash](https://github.com/fnkr/github-action-git-bash) GitHub Action by (fnkr)[https://github.com/fnkr]
