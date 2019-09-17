@@ -6,8 +6,9 @@
 ##
 
 # Config
+timestamp=`date +%s`
 slack_webhook_url="$SLACK_WEBHOOK_URL"
-tmp_filename="tmp-jira.txt"
+tmp_filename="tmp-jira-tickets-$timestamp.txt"
 
 # Get the number of commits since last tag
 prev_tag=`git rev-list --tags --no-walk --max-count=1`
@@ -19,11 +20,15 @@ git log --pretty=format:"%s" -n $num_commits \
     | sort -t: -u -k1,1 \
     | while read -r t ; do echo -e "• $t (https://$JIRA_PREFIX.atlassian.net/browse/$t)" >> $tmp_filename ; done
 
+if [ ! -f "$tmp_filename" ]; then
+  echo 'No JIRA tickets detected since last commit.'
+  exit 0
+fi
+
 # Send a Slack webhook
-timestamp=`date +%s`
-header="<!here> *Deploy Completed <!date^$timestamp^- {date_long_pretty} {time}|just now>*\n\n*JIRA Tickets Deployed:*"
+header="<!here> *JIRA Tickets Deployed <!date^$timestamp^- {date_long_pretty} {time}|just now>*\n\n**"
 payload=`< $tmp_filename sed "$!G" | paste -sd "\\n" -`
-curl -X POST --data-urlencode "payload={\"text\": \"$SLACK_HEADER\n$payload\"}" $slack_webhook_url
+curl -X POST --data-urlencode "payload={\"text\": \"$header\n$payload\"}" $slack_webhook_url
 
 # Cleanup, remove the temporary file
 rm $tmp_filename
