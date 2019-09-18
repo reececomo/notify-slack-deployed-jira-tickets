@@ -7,7 +7,7 @@
 repo_name=`basename -s .git $(git config --get remote.origin.url)`
 
 # Config
-platform_name=${PLATFORM_NAME:-$repo_name}
+product_name=${PRODUCT_NAME:-$repo_name}
 timestamp=`date +%s`
 slack_webhook_url="$SLACK_WEBHOOK_URL"
 tmp_filename="tmp-jira-tickets-$timestamp.txt"
@@ -28,7 +28,7 @@ if [ ! -f "$tmp_filename" ]; then
 fi
 
 # Send a Slack webhook
-header="> <!here> *$platform_name is being deployed!*\n>*JIRA Tickets Mentioned <!date^$timestamp^- {date_long_pretty} {time}|just now>*\n"
+header="> <!here> *$product_name is being deployed!*\n>*JIRA Tickets Mentioned <!date^$timestamp^- {date_long_pretty} {time}|just now>*\n"
 payload=`< $tmp_filename sed '/^[ \t]*$/d' | paste -sd "\\n" -`
 curl -X POST --data-urlencode "payload={\"text\": \"$header\n$payload\"}" $slack_webhook_url
 
