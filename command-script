@@ -2,7 +2,7 @@
 
 ##
 # Sends a Slack webhook containing a list of all
-# the JIRA tickets since the last merge commit.
+# the JIRA tickets since the last tagged version.
 ##
 
 # Config
@@ -10,14 +10,18 @@ timestamp=`date +%s`
 slack_webhook_url="$SLACK_WEBHOOK_URL"
 tmp_filename="tmp-jira-tickets-$timestamp.txt"
 
-# Get a list of all the JIRA tickets since last merge commit
-git log --pretty=format:"%s" $(git log --merges -n 2 --oneline | tail -1 | cut -f1 -d' ')..HEAD \
+# Get the number of commits since last tag
+prev_tag=`git rev-list --tags --no-walk --max-count=1`
+num_commits=`git rev-list $prev_tag..HEAD --count`
+
+# Get a list of all the JIRA tickets since
+git log --pretty=format:"%s" -n $num_commits \
     | grep -o [A-Z]+-[0-9]+ -E \
     | sort -t: -u -k1,1 \
     | while read -r t ; do echo -e "• $t (https://$JIRA_PREFIX.atlassian.net/browse/$t)" >> $tmp_filename ; done
 
 if [ ! -f "$tmp_filename" ]; then
-  echo 'No JIRA tickets detected since last merge commit.'
+  echo 'No JIRA tickets detected since last tag.'
   exit 0
 fi
 
