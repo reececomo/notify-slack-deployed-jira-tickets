@@ -7,15 +7,16 @@ GitHub Action to notify Slack when JIRA tickets have been deployed.
 
 ## Variables
 
-- `SLACK_WEBHOOK_URL`
-- `JIRA_PREFIX` (e.g. "https://myjiraboard.atlassian.net" would be "myjiraboard")
+- `PLATFORM_NAME` (optional) - Specify name in the "<platform_name> is being deployed!" message (will use repo name otherwise)
+- `SLACK_WEBHOOK_URL` **Required** - e.g. https://hooks.slack.com/services/ABCDE12345/ABCDE12345/abcdef12345abcdef12345abcdef
+- `JIRA_PREFIX` **Required** - e.g. "https://myjiraboard.atlassian.net" would be "myjiraboard"
 
 ## Usage example
 
 ```yaml
     - name: Notify Slack about JIRA tickets that have been deployed
       uses: reececomo/notify-slack-deployed-jira-tickets
-      with:
+      env:
         SLACK_WEBHOOK_URL: '...'
         JIRA_PREFIX: '...'
 ```
