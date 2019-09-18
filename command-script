@@ -1,8 +1,8 @@
 #!/bin/bash
 
 ##
-# Sends a Slack webhook containing a list
-# of all the JIRA tickets since the last tag.
+# Sends a Slack webhook containing a list of all
+# the JIRA tickets since the last merge commit.
 ##
 
 # Config
@@ -10,23 +10,19 @@ timestamp=`date +%s`
 slack_webhook_url="$SLACK_WEBHOOK_URL"
 tmp_filename="tmp-jira-tickets-$timestamp.txt"
 
-# Get the number of commits since last tag
-prev_tag=`git rev-list --tags --no-walk --max-count=1`
-num_commits=`git rev-list $prev_tag..HEAD --count`
-
-# Get a list of all the JIRA tickets since
-git log --pretty=format:"%s" -n $num_commits \
+# Get a list of all the JIRA tickets since last merge commit
+git log --pretty=format:"%s" $(git log --merges -n 2 --oneline | tail -1 | cut -f1 -d' ')..HEAD \
     | grep -o [A-Z]+-[0-9]+ -E \
     | sort -t: -u -k1,1 \
     | while read -r t ; do echo -e "• $t (https://$JIRA_PREFIX.atlassian.net/browse/$t)" >> $tmp_filename ; done
 
 if [ ! -f "$tmp_filename" ]; then
-  echo 'No JIRA tickets detected since last commit.'
+  echo 'No JIRA tickets detected since last merge commit.'
   exit 0
 fi
 
 # Send a Slack webhook
-header="> <!here> *JIRA Tickets Deployed <!date^$timestamp^- {date_long_pretty} {time}|just now>*\n\n"
+header="> <!here> *JIRA Tickets Mentioned <!date^$timestamp^- {date_long_pretty} {time}|just now>*\n\n"
 payload=`< $tmp_filename sed "$!G" | paste -sd "\\n" -`
 curl -X POST --data-urlencode "payload={\"text\": \"$header\n$payload\"}" $slack_webhook_url
 
