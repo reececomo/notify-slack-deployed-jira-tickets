@@ -2,7 +2,7 @@
 
 GitHub Action to notify Slack when JIRA tickets have been deployed.
 
-* Counts all JIRA tickets in commit messages since the previous tag.
+* Counts all JIRA tickets mentioned in commit messages since the previous merge commit.
 * JIRA ticket mentions must be in the format: `BOARD-123`
 
 ## Variables
