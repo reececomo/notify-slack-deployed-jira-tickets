@@ -27,7 +27,7 @@ if [ ! -f "$tmp_filename" ]; then
 fi
 
 # Send a Slack webhook
-header="> <!here> *$product_name is being deployed!*\n>*JIRA Tickets Mentioned <!date^$timestamp^- {date_long_pretty} {time}|just now>*\n"
+header="> <!here> *$product_name has been updated!*\n>*JIRA Tickets Mentioned <!date^$timestamp^- {date_long_pretty} {time}|just now>*\n"
 payload=`< $tmp_filename sed '/^[ \t]*$/d' | paste -sd "\\n" -`
 curl -X POST --data-urlencode "payload={\"text\": \"$header\n$payload\"}" $slack_webhook_url
 
