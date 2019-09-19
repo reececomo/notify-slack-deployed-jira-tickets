@@ -4,10 +4,9 @@
 # Sends a Slack webhook containing a list of all
 # the JIRA tickets since the last tagged version.
 ##
-repo_name=`basename -s .git $(git config --get remote.origin.url)`
 
 # Config
-product_name=${PRODUCT_NAME:-$repo_name}
+product_name=${PRODUCT_NAME:-Product}
 timestamp=`date +%s`
 slack_webhook_url="$SLACK_WEBHOOK_URL"
 tmp_filename="tmp-jira-tickets-$timestamp.txt"
